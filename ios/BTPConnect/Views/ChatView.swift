@@ -3,32 +3,50 @@ import SwiftUI
 struct ChatView: View {
     let conversation: Conversation
     @Environment(AppViewModel.self) private var viewModel
+    @Environment(\.dismiss) private var dismiss
     @State private var messageText: String = ""
     @State private var showAttachmentMenu: Bool = false
+    @State private var showEmojiPicker: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
             chatHeader
             pinnedMessage
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(viewModel.chatMessages) { message in
-                        MessageBubble(message: message)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(viewModel.chatMessages) { message in
+                            MessageBubble(message: message)
+                                .id(message.id)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                }
+                .onChange(of: viewModel.chatMessages.count) {
+                    if let last = viewModel.chatMessages.last {
+                        withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
             }
             quickReplies
             inputBar
         }
         .background(Color(.systemBackground))
         .navigationBarHidden(true)
+        .sheet(isPresented: $showEmojiPicker) {
+            EmojiPickerView { emoji in
+                messageText += emoji
+                showEmojiPicker = false
+            }
+            .presentationDetents([.height(300)])
+        }
     }
 
     private var chatHeader: some View {
         HStack(spacing: 12) {
             Button {
+                dismiss()
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.body.bold())
@@ -37,7 +55,6 @@ struct ChatView: View {
                     .background(Color(.secondarySystemGroupedBackground))
                     .clipShape(Circle())
             }
-
             ZStack {
                 Circle()
                     .fill(LinearGradient(colors: [Color(.systemGray4), Color(.systemGray5)], startPoint: .top, endPoint: .bottom))
@@ -46,7 +63,6 @@ struct ChatView: View {
                     .font(.title3.bold())
                     .foregroundStyle(.secondary)
             }
-
             VStack(alignment: .leading, spacing: 2) {
                 Text(conversation.artisanName)
                     .font(.headline)
@@ -62,9 +78,7 @@ struct ChatView: View {
                         .foregroundStyle(.green)
                 }
             }
-
             Spacer()
-
             if conversation.isProSeen {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark")
@@ -82,9 +96,7 @@ struct ChatView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(Color(.systemBackground))
-        .overlay(alignment: .bottom) {
-            Divider()
-        }
+        .overlay(alignment: .bottom) { Divider() }
     }
 
     private var pinnedMessage: some View {
@@ -148,20 +160,28 @@ struct ChatView: View {
                 Button("Position GPS") { }
                 Button("Annuler", role: .cancel) { }
             }
-
-            TextField("Écrire un message", text: $messageText)
-                .font(.subheadline)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(Capsule())
-
-            Button { } label: {
+            HStack(spacing: 6) {
+                TextField("Écrire un message", text: $messageText)
+                    .font(.subheadline)
+                Button {
+                    showEmojiPicker.toggle()
+                } label: {
+                    Text("😊")
+                        .font(.title3)
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(Capsule())
+            Button {
+                sendMessage()
+            } label: {
                 Image(systemName: "paperplane.fill")
                     .font(.body)
                     .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
-                    .background(ArtigoTheme.orange)
+                    .background(messageText.isEmpty ? Color.gray : ArtigoTheme.orange)
                     .clipShape(Circle())
             }
             .disabled(messageText.isEmpty)
@@ -169,9 +189,13 @@ struct ChatView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(Color(.systemBackground))
-        .overlay(alignment: .top) {
-            Divider()
-        }
+        .overlay(alignment: .top) { Divider() }
+    }
+
+    private func sendMessage() {
+        guard !messageText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        viewModel.sendMessage(text: messageText, in: conversation)
+        messageText = ""
     }
 }
 
@@ -183,7 +207,6 @@ struct MessageBubble: View {
             if let attachmentType = message.attachmentType {
                 attachmentView(type: attachmentType)
             }
-
             if !message.text.isEmpty {
                 Text(message.text)
                     .font(.subheadline)
@@ -193,7 +216,6 @@ struct MessageBubble: View {
                     .background(message.isFromClient ? ArtigoTheme.orange : Color(.secondarySystemGroupedBackground))
                     .clipShape(.rect(cornerRadius: 16))
             }
-
             HStack(spacing: 6) {
                 Text(message.timestamp)
                     .font(.caption2)
@@ -204,7 +226,6 @@ struct MessageBubble: View {
                         .foregroundStyle(.secondary)
                 }
             }
-
             if let reaction = message.reaction {
                 reactionBubbles(selected: reaction)
             }
@@ -231,7 +252,6 @@ struct MessageBubble: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-
             VStack(alignment: .leading, spacing: 2) {
                 Text(message.attachmentName ?? "")
                     .font(.caption.bold())
