@@ -8,6 +8,7 @@ nonisolated struct NotificationItem: Identifiable, Hashable, Sendable {
     let timestamp: String
     let isRead: Bool
     let type: NotificationType
+    let relatedUserName: String?
 }
 
 nonisolated enum NotificationType: String, Hashable, Sendable {
