@@ -3,13 +3,19 @@ import SwiftUI
 struct NotificationsView: View {
     @Environment(AppViewModel.self) private var viewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var navigateToConversation: Conversation? = nil
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 10) {
                     ForEach(viewModel.notifications) { notification in
-                        NotificationRow(notification: notification)
+                        Button {
+                            handleNotificationTap(notification)
+                        } label: {
+                            NotificationRow(notification: notification)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -21,6 +27,23 @@ struct NotificationsView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Fermer") { dismiss() }
                 }
+            }
+            .navigationDestination(item: $navigateToConversation) { conversation in
+                ChatView(conversation: conversation)
+            }
+        }
+    }
+
+    private func handleNotificationTap(_ notification: NotificationItem) {
+        viewModel.markNotificationRead(notification.id)
+        if notification.type == .message,
+           let conversation = viewModel.conversations.first(where: {
+               $0.artisanName == notification.relatedUserName
+           }) {
+            dismiss()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                viewModel.selectedTab = .messages
+                navigateToConversation = conversation
             }
         }
     }
@@ -37,7 +60,6 @@ struct NotificationRow: View {
                 .frame(width: 40, height: 40)
                 .background(iconColor.opacity(0.1))
                 .clipShape(.rect(cornerRadius: 10))
-
             VStack(alignment: .leading, spacing: 3) {
                 Text(notification.title)
                     .font(.subheadline.weight(.medium))
@@ -46,9 +68,7 @@ struct NotificationRow: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
-
             Spacer()
-
             VStack(alignment: .trailing, spacing: 4) {
                 Text(notification.timestamp)
                     .font(.caption2)
