@@ -20,7 +20,7 @@ struct ArtisanDetailSheet: View {
                         .font(.headline)
                     Text(artisan.profession)
                         .font(.subheadline)
-                        .foregroundStyle(ArtigoTheme.orange)
+                        .foregroundStyle(ArtisgoTheme.orange)
                     HStack(spacing: 12) {
                         HStack(spacing: 3) {
                             Image(systemName: "star.fill")
