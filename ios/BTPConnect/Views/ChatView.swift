@@ -153,7 +153,7 @@ struct ChatView: View {
             Button { showAttachmentMenu.toggle() } label: {
                 Image(systemName: "plus")
                     .font(.body.bold())
-                    .foregroundStyle(ArtigoTheme.orange)
+                    .foregroundStyle(ArtisgoTheme.orange)
                     .frame(width: 36, height: 36)
                     .background(ArtisgoTheme.orange.opacity(0.12))
                     .clipShape(Circle())
