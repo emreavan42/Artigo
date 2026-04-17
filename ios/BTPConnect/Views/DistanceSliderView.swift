@@ -22,18 +22,18 @@ struct DistanceSliderView: View {
                         .frame(height: 4)
 
                     Capsule()
-                        .fill(ArtigoTheme.orange)
+                        .fill(ArtisgoTheme.orange)
                         .frame(width: CGFloat(currentIndex) * stepWidth, height: 4)
 
                     ForEach(0..<steps.count, id: \.self) { i in
                         Circle()
-                            .fill(i <= currentIndex ? ArtigoTheme.orange : Color(.systemGray4))
+                            .fill(i <= currentIndex ? ArtisgoTheme.orange : Color(.systemGray4))
                             .frame(width: 8, height: 8)
                             .offset(x: CGFloat(i) * stepWidth - 4)
                     }
 
                     Circle()
-                        .fill(ArtigoTheme.orange)
+                        .fill(ArtisgoTheme.orange)
                         .frame(width: 24, height: 24)
                         .shadow(color: ArtigoTheme.orange.opacity(0.3), radius: 4, y: 2)
                         .offset(x: CGFloat(currentIndex) * stepWidth - 12)
@@ -55,7 +55,7 @@ struct DistanceSliderView: View {
                 ForEach(0..<labels.count, id: \.self) { i in
                     Text(labels[i])
                         .font(.system(size: 9))
-                        .foregroundStyle(i == currentIndex ? ArtigoTheme.orange : .secondary)
+                        .foregroundStyle(i == currentIndex ? ArtisgoTheme.orange : .secondary)
                         .fontWeight(i == currentIndex ? .bold : .regular)
                         .frame(maxWidth: .infinity)
                 }

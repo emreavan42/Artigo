@@ -47,19 +47,19 @@ struct ClassementView: View {
         .frame(maxWidth: .infinity)
         .background(
             LinearGradient(
-                colors: [ArtigoTheme.orange.opacity(0.15), ArtigoTheme.orange.opacity(0.05)],
+                colors: [ArtisgoTheme.orange.opacity(0.15), ArtisgoTheme.orange.opacity(0.05)],
                 startPoint: .top,
                 endPoint: .bottom
             )
         )
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
     }
 
     private func rankRow(_ artisan: (rank: Int, name: String, profession: String, rating: Double, projects: Int)) -> some View {
         HStack(spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(artisan.rank <= 3 ? ArtigoTheme.orange : Color(.systemGray4))
+                    .fill(artisan.rank <= 3 ? ArtisgoTheme.orange : Color(.systemGray4))
                     .frame(width: 36, height: 36)
                 Text("\(artisan.rank)")
                     .font(.headline)
@@ -71,7 +71,7 @@ struct ClassementView: View {
                     .font(.headline)
                 Text(artisan.profession)
                     .font(.caption)
-                    .foregroundStyle(ArtigoTheme.orange)
+                    .foregroundStyle(ArtisgoTheme.orange)
             }
 
             Spacer()
@@ -91,6 +91,6 @@ struct ClassementView: View {
         }
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
     }
 }

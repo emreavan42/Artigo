@@ -38,13 +38,13 @@ struct MessagesListView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 8) {
-                    ArtigoLogoView(size: 28)
+                    ArtisgoLogoView(size: 28)
                     Text("Messagerie")
                         .font(.largeTitle.bold())
                 }
                 Text("Conversations chantier")
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(ArtigoTheme.orange)
+                    .foregroundStyle(ArtisgoTheme.orange)
             }
             Spacer()
         }
@@ -98,7 +98,7 @@ struct ConversationRow: View {
                     if conversation.isPinned {
                         Image(systemName: "pin.fill")
                             .font(.caption2)
-                            .foregroundStyle(ArtigoTheme.orange)
+                            .foregroundStyle(ArtisgoTheme.orange)
                     }
                 }
                 Text(conversation.profession)
@@ -132,13 +132,13 @@ struct ConversationRow: View {
                         .font(.caption2.bold())
                         .foregroundStyle(.white)
                         .frame(minWidth: 22, minHeight: 22)
-                        .background(ArtigoTheme.orange)
+                        .background(ArtisgoTheme.orange)
                         .clipShape(Circle())
                 }
             }
         }
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
     }
 }

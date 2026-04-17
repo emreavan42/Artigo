@@ -54,7 +54,7 @@ struct ArtisanDetailSheet: View {
                 if artisan.isUrgent {
                     Label("Urgent", systemImage: "exclamationmark.triangle.fill")
                         .font(.caption.bold())
-                        .foregroundStyle(ArtigoTheme.orange)
+                        .foregroundStyle(ArtisgoTheme.orange)
                 }
             }
 
@@ -74,7 +74,7 @@ struct ArtisanDetailSheet: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(ArtigoTheme.orange)
+                        .background(ArtisgoTheme.orange)
                         .clipShape(.rect(cornerRadius: 12))
                 }
             }

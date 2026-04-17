@@ -75,21 +75,21 @@ struct NotificationRow: View {
                     .foregroundStyle(.secondary)
                 if !notification.isRead {
                     Circle()
-                        .fill(ArtigoTheme.orange)
+                        .fill(ArtisgoTheme.orange)
                         .frame(width: 8, height: 8)
                 }
             }
         }
         .padding(14)
-        .background(notification.isRead ? Color(.secondarySystemGroupedBackground) : ArtigoTheme.orange.opacity(0.05))
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .background(notification.isRead ? Color(.secondarySystemGroupedBackground) : ArtisgoTheme.orange.opacity(0.05))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
     }
 
     private var iconColor: Color {
         switch notification.type {
         case .message: return .blue
         case .devis: return .green
-        case .chantier: return ArtigoTheme.orange
+        case .chantier: return ArtisgoTheme.orange
         case .avis: return .yellow
         case .system: return .secondary
         }

@@ -33,7 +33,7 @@ struct ProfileView: View {
         VStack(spacing: 16) {
             HStack {
                 HStack(spacing: 8) {
-                    ArtigoLogoView(size: 28)
+                    ArtisgoLogoView(size: 28)
                     Text("Mon Profil")
                         .font(.title2.bold())
                 }
@@ -58,12 +58,12 @@ struct ProfileView: View {
             VStack(spacing: 14) {
                 ZStack(alignment: .bottomTrailing) {
                     Circle()
-                        .fill(LinearGradient(colors: [ArtigoTheme.orange.opacity(0.3), ArtigoTheme.orange.opacity(0.1)], startPoint: .top, endPoint: .bottom))
+                        .fill(LinearGradient(colors: [ArtisgoTheme.orange.opacity(0.3), ArtisgoTheme.orange.opacity(0.1)], startPoint: .top, endPoint: .bottom))
                         .frame(width: 90, height: 90)
                         .overlay {
                             Image(systemName: "person.fill")
                                 .font(.system(size: 36))
-                                .foregroundStyle(ArtigoTheme.orange.opacity(0.6))
+                                .foregroundStyle(ArtisgoTheme.orange.opacity(0.6))
                         }
                     Button { } label: {
                         Image(systemName: "camera.fill")
@@ -105,7 +105,7 @@ struct ProfileView: View {
         VStack(spacing: 6) {
             Image(systemName: icon)
                 .font(.body)
-                .foregroundStyle(ArtigoTheme.orange)
+                .foregroundStyle(ArtisgoTheme.orange)
             Text(value)
                 .font(.title2.bold())
             Text(label)
@@ -115,7 +115,7 @@ struct ProfileView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
     }
 
     private var documentsSection: some View {
@@ -126,18 +126,18 @@ struct ProfileView: View {
                 Spacer()
                 Text("Organisé")
                     .font(.caption.bold())
-                    .foregroundStyle(ArtigoTheme.orange)
+                    .foregroundStyle(ArtisgoTheme.orange)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
                     .overlay(
-                        Capsule().stroke(ArtigoTheme.orange, lineWidth: 1)
+                        Capsule().stroke(ArtisgoTheme.orange, lineWidth: 1)
                     )
             }
 
             let columns = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
             LazyVGrid(columns: columns, spacing: 10) {
-                documentCard(icon: "checkmark.shield.fill", title: "Assurances", subtitle: "Décennale, RC pro", count: "2 actifs", color: ArtigoTheme.orange)
-                documentCard(icon: "rosette", title: "Certifications", subtitle: "RGE, Qualibat", count: "4 suivis", color: ArtigoTheme.orange)
+                documentCard(icon: "checkmark.shield.fill", title: "Assurances", subtitle: "Décennale, RC pro", count: "2 actifs", color: ArtisgoTheme.orange)
+                documentCard(icon: "rosette", title: "Certifications", subtitle: "RGE, Qualibat", count: "4 suivis", color: ArtisgoTheme.orange)
                 documentCard(icon: "doc.text.fill", title: "Factures PDF", subtitle: "Historique complet", count: "", color: .blue)
                 documentCard(icon: "archivebox.fill", title: "Devis archivés", subtitle: "Suivi et comparaison", count: "", color: .secondary)
             }
@@ -161,7 +161,7 @@ struct ProfileView: View {
             if !count.isEmpty {
                 Text(count)
                     .font(.caption2.bold())
-                    .foregroundStyle(ArtigoTheme.orange)
+                    .foregroundStyle(ArtisgoTheme.orange)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -175,9 +175,9 @@ struct ProfileView: View {
             HStack(spacing: 12) {
                 Image(systemName: "trophy.fill")
                     .font(.title3)
-                    .foregroundStyle(ArtigoTheme.orange)
+                    .foregroundStyle(ArtisgoTheme.orange)
                     .frame(width: 44, height: 44)
-                    .background(ArtigoTheme.orange.opacity(0.1))
+                    .background(ArtisgoTheme.orange.opacity(0.1))
                     .clipShape(.rect(cornerRadius: 12))
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Classement du mois")
@@ -194,7 +194,7 @@ struct ProfileView: View {
             }
             .padding(14)
             .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+            .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
         }
         .buttonStyle(.plain)
         .padding(.horizontal, 16)

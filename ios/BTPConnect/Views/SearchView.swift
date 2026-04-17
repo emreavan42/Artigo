@@ -65,7 +65,7 @@ struct SearchView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 8) {
-                    ArtigoLogoView(size: 28)
+                    ArtisgoLogoView(size: 28)
                     Text("Vue quartier")
                         .font(.title2.bold())
                 }
@@ -83,7 +83,7 @@ struct SearchView: View {
         HStack(spacing: 8) {
             statBadge(value: "\(viewModel.filteredArtisans.count)", label: "artisans\nvisibles", color: .primary)
             statBadge(value: "\(viewModel.chantiers.count)", label: "chantiers\nvisibles", color: .primary)
-            statBadge(value: "2", label: "zones\nfavorites", color: ArtigoTheme.orange)
+            statBadge(value: "2", label: "zones\nfavorites", color: ArtisgoTheme.orange)
         }
         .padding(.horizontal, 16)
     }
@@ -129,7 +129,7 @@ struct SearchView: View {
                             .foregroundStyle(viewModel.selectedMapFilter == filter ? .white : .primary)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
-                            .background(viewModel.selectedMapFilter == filter ? ArtigoTheme.orange : Color(.secondarySystemGroupedBackground))
+                            .background(viewModel.selectedMapFilter == filter ? ArtisgoTheme.orange : Color(.secondarySystemGroupedBackground))
                             .clipShape(Capsule())
                     }
                 }
@@ -156,7 +156,7 @@ struct SearchView: View {
                     .foregroundStyle(viewMode == mode ? .white : .primary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(viewMode == mode ? ArtigoTheme.orange : Color.clear)
+                    .background(viewMode == mode ? ArtisgoTheme.orange : Color.clear)
                     .clipShape(.rect(cornerRadius: 10))
                 }
             }
@@ -180,13 +180,13 @@ struct SearchView: View {
                         } label: {
                             Text(cat)
                                 .font(.caption)
-                                .foregroundStyle(viewModel.selectedCategory == cat ? ArtigoTheme.orange : .primary)
+                                .foregroundStyle(viewModel.selectedCategory == cat ? ArtisgoTheme.orange : .primary)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 6)
-                                .background(viewModel.selectedCategory == cat ? ArtigoTheme.orange.opacity(0.12) : Color(.secondarySystemGroupedBackground))
+                                .background(viewModel.selectedCategory == cat ? ArtisgoTheme.orange.opacity(0.12) : Color(.secondarySystemGroupedBackground))
                                 .clipShape(Capsule())
                                 .overlay(
-                                    Capsule().stroke(viewModel.selectedCategory == cat ? ArtigoTheme.orange : Color.clear, lineWidth: 1)
+                                    Capsule().stroke(viewModel.selectedCategory == cat ? ArtisgoTheme.orange : Color.clear, lineWidth: 1)
                                 )
                         }
                     }
@@ -227,13 +227,13 @@ struct SearchView: View {
                         Text("\(rating, specifier: "%.1f")+")
                             .font(.subheadline.weight(.medium))
                     }
-                    .foregroundStyle(viewModel.selectedRatingFilter == rating ? ArtigoTheme.orange : .primary)
+                    .foregroundStyle(viewModel.selectedRatingFilter == rating ? ArtisgoTheme.orange : .primary)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
-                    .background(viewModel.selectedRatingFilter == rating ? ArtigoTheme.orange.opacity(0.12) : Color(.secondarySystemGroupedBackground))
+                    .background(viewModel.selectedRatingFilter == rating ? ArtisgoTheme.orange.opacity(0.12) : Color(.secondarySystemGroupedBackground))
                     .clipShape(Capsule())
                     .overlay(
-                        Capsule().stroke(viewModel.selectedRatingFilter == rating ? ArtigoTheme.orange : Color.clear, lineWidth: 1)
+                        Capsule().stroke(viewModel.selectedRatingFilter == rating ? ArtisgoTheme.orange : Color.clear, lineWidth: 1)
                     )
                 }
             }
@@ -251,7 +251,7 @@ struct SearchView: View {
                     } label: {
                         Image(systemName: "mappin.circle.fill")
                             .font(.title2)
-                            .foregroundStyle(artisan.isUrgent ? ArtigoTheme.orange : .blue)
+                            .foregroundStyle(artisan.isUrgent ? ArtisgoTheme.orange : .blue)
                             .background(Circle().fill(Color(.systemBackground)).padding(-2))
                     }
                 }
@@ -305,12 +305,12 @@ struct SearchView: View {
                     if artisan.isUrgent {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.caption2)
-                            .foregroundStyle(ArtigoTheme.orange)
+                            .foregroundStyle(ArtisgoTheme.orange)
                     }
                 }
                 Text(artisan.profession)
                     .font(.subheadline)
-                    .foregroundStyle(ArtigoTheme.orange)
+                    .foregroundStyle(ArtisgoTheme.orange)
                 HStack(spacing: 12) {
                     HStack(spacing: 3) {
                         Image(systemName: "star.fill")
@@ -341,12 +341,12 @@ struct SearchView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
-                    .background(ArtigoTheme.orange)
+                    .background(ArtisgoTheme.orange)
                     .clipShape(Capsule())
             }
         }
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
     }
 }

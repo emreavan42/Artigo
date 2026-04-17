@@ -73,7 +73,7 @@ struct PostChantierView: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
-                            .background(ArtigoTheme.orange)
+                            .background(ArtisgoTheme.orange)
                             .clipShape(.rect(cornerRadius: 12))
                     }
                 }
@@ -88,7 +88,7 @@ struct PostChantierView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("ÉTAPE PAR ÉTAPE")
                 .font(.caption.bold())
-                .foregroundStyle(ArtigoTheme.orange)
+                .foregroundStyle(ArtisgoTheme.orange)
             Text("Décrivez votre besoin avec précision")
                 .font(.title3.bold())
             Text("Un formulaire riche, pensé pour rester lisible sur mobile et prêt à être branché au backend plus tard.")
@@ -128,14 +128,14 @@ struct PostChantierView: View {
                 } label: {
                     Text(category)
                         .font(.subheadline)
-                        .foregroundStyle(selectedCategory == category ? ArtigoTheme.orange : .primary)
+                        .foregroundStyle(selectedCategory == category ? ArtisgoTheme.orange : .primary)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color(.secondarySystemGroupedBackground))
                         .clipShape(Capsule())
                         .overlay(
-                            Capsule().stroke(selectedCategory == category ? ArtigoTheme.orange : Color.clear, lineWidth: 1.5)
+                            Capsule().stroke(selectedCategory == category ? ArtisgoTheme.orange : Color.clear, lineWidth: 1.5)
                         )
                 }
             }
@@ -157,12 +157,12 @@ struct PostChantierView: View {
             Toggle(isOn: $isUrgent) {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(ArtigoTheme.orange)
+                        .foregroundStyle(ArtisgoTheme.orange)
                     Text("Chantier urgent")
                         .font(.subheadline)
                 }
             }
-            .tint(ArtigoTheme.orange)
+            .tint(ArtisgoTheme.orange)
         }
     }
 

@@ -36,7 +36,7 @@ struct HomeView: View {
         HStack(spacing: 12) {
             HStack(spacing: 8) {
                 ArtigoLogoView(size: 34)
-                Text("Artigo")
+                Text("Artisgo")
                     .font(.title2.bold())
                     .foregroundStyle(.primary)
             }
@@ -91,7 +91,7 @@ struct HomeView: View {
     private var chantierCard: some View {
         HStack {
             Image(systemName: "mappin.circle.fill")
-                .foregroundStyle(ArtigoTheme.orange.opacity(0.7))
+                .foregroundStyle(ArtisgoTheme.orange.opacity(0.7))
                 .font(.title3)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Chantier \(viewModel.currentLocation)")
@@ -163,7 +163,7 @@ struct HomeView: View {
         .frame(width: 300, alignment: .leading)
         .background(
             LinearGradient(
-                colors: [ArtigoTheme.orange, ArtigoTheme.orange.opacity(0.85)],
+                colors: [ArtisgoTheme.orange, ArtisgoTheme.orange.opacity(0.85)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -200,7 +200,7 @@ struct HomeView: View {
         .frame(width: 300, alignment: .leading)
         .background(
             LinearGradient(
-                colors: [ArtigoTheme.darkBlue, Color(hex: "2A5D8F")],
+                colors: [ArtisgoTheme.darkBlue, Color(hex: "2A5D8F")],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -249,7 +249,7 @@ struct HomeView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .background(ArtigoTheme.orange)
-            .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+            .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
         }
         .padding(.horizontal, 16)
     }
@@ -272,12 +272,12 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
-                colors: [ArtigoTheme.darkBlue, Color(hex: "2A5D8F")],
+                colors: [ArtisgoTheme.darkBlue, Color(hex: "2A5D8F")],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         )
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
         .padding(.horizontal, 16)
     }
 
@@ -294,7 +294,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(value)
                 .font(.title.bold())
-                .foregroundStyle(ArtigoTheme.orange)
+                .foregroundStyle(ArtisgoTheme.orange)
             Text(label)
                 .font(.caption)
                 .foregroundStyle(.secondary)

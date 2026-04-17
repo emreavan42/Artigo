@@ -42,7 +42,7 @@ struct SettingsView: View {
                     .foregroundStyle(selectedTab == 0 ? .white : .primary)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(selectedTab == 0 ? ArtigoTheme.orange : Color(.secondarySystemGroupedBackground))
+                    .background(selectedTab == 0 ? ArtisgoTheme.orange : Color(.secondarySystemGroupedBackground))
                     .clipShape(Capsule())
             }
             Button {
@@ -53,7 +53,7 @@ struct SettingsView: View {
                     .foregroundStyle(selectedTab == 1 ? .white : .primary)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(selectedTab == 1 ? ArtigoTheme.orange : Color(.secondarySystemGroupedBackground))
+                    .background(selectedTab == 1 ? ArtisgoTheme.orange : Color(.secondarySystemGroupedBackground))
                     .clipShape(Capsule())
             }
             Spacer()
@@ -83,13 +83,13 @@ struct SettingsView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .background(ArtigoTheme.orange)
+                    .background(ArtisgoTheme.orange)
                     .clipShape(.rect(cornerRadius: 12))
             }
             Button { } label: {
                 Text("Changer ma zone")
                     .font(.subheadline.bold())
-                    .foregroundStyle(ArtigoTheme.darkBlue)
+                    .foregroundStyle(ArtisgoTheme.darkBlue)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
                     .background(.white.opacity(0.9))
@@ -144,9 +144,9 @@ struct SettingsView: View {
         HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.body)
-                .foregroundStyle(ArtigoTheme.orange.opacity(0.8))
+                .foregroundStyle(ArtisgoTheme.orange.opacity(0.8))
                 .frame(width: 36, height: 36)
-                .background(ArtigoTheme.orange.opacity(0.08))
+                .background(ArtisgoTheme.orange.opacity(0.08))
                 .clipShape(.rect(cornerRadius: 8))
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -159,10 +159,10 @@ struct SettingsView: View {
             if let badge {
                 Text(badge)
                     .font(.system(size: 8, weight: .bold))
-                    .foregroundStyle(ArtigoTheme.orange)
+                    .foregroundStyle(ArtisgoTheme.orange)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 3)
-                    .background(ArtigoTheme.orange.opacity(0.1))
+                    .background(ArtisgoTheme.orange.opacity(0.1))
                     .clipShape(Capsule())
             }
             Image(systemName: "chevron.right")

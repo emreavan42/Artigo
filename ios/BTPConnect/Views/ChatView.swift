@@ -120,7 +120,7 @@ struct ChatView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(ArtigoTheme.orange.opacity(0.08))
+                .background(ArtisgoTheme.orange.opacity(0.08))
             }
         }
     }
@@ -155,7 +155,7 @@ struct ChatView: View {
                     .font(.body.bold())
                     .foregroundStyle(ArtigoTheme.orange)
                     .frame(width: 36, height: 36)
-                    .background(ArtigoTheme.orange.opacity(0.12))
+                    .background(ArtisgoTheme.orange.opacity(0.12))
                     .clipShape(Circle())
             }
             .confirmationDialog("Envoyer", isPresented: $showAttachmentMenu) {
@@ -187,7 +187,7 @@ struct ChatView: View {
                     .font(.body)
                     .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
-                    .background(messageText.isEmpty ? Color.gray : ArtigoTheme.orange)
+                    .background(messageText.isEmpty ? Color.gray : ArtisgoTheme.orange)
                     .clipShape(Circle())
             }
             .disabled(messageText.isEmpty)
@@ -219,7 +219,7 @@ struct MessageBubble: View {
                     .foregroundStyle(message.isFromClient ? .white : .primary)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .background(message.isFromClient ? ArtigoTheme.orange : Color(.secondarySystemGroupedBackground))
+                    .background(message.isFromClient ? ArtisgoTheme.orange : Color(.secondarySystemGroupedBackground))
                     .clipShape(.rect(cornerRadius: 16))
             }
             HStack(spacing: 6) {
@@ -250,7 +250,7 @@ struct MessageBubble: View {
     private func attachmentView(type: AttachmentType) -> some View {
         HStack(spacing: 10) {
             RoundedRectangle(cornerRadius: 8)
-                .fill(type == .pdf ? ArtigoTheme.orange.opacity(0.15) : Color(.secondarySystemGroupedBackground))
+                .fill(type == .pdf ? ArtisgoTheme.orange.opacity(0.15) : Color(.secondarySystemGroupedBackground))
                 .frame(width: 48, height: 48)
                 .overlay {
                     if type == .pdf {
@@ -260,7 +260,7 @@ struct MessageBubble: View {
                             Text("PDF")
                                 .font(.system(size: 8, weight: .bold))
                         }
-                        .foregroundStyle(ArtigoTheme.orange)
+                        .foregroundStyle(ArtisgoTheme.orange)
                     } else if type == .photo {
                         Image(systemName: "photo.fill")
                             .foregroundStyle(.secondary)
@@ -282,7 +282,7 @@ struct MessageBubble: View {
             }
         }
         .padding(10)
-        .background(message.isFromClient ? ArtigoTheme.orange : Color(.secondarySystemGroupedBackground))
+        .background(message.isFromClient ? ArtisgoTheme.orange : Color(.secondarySystemGroupedBackground))
         .clipShape(.rect(cornerRadius: 12))
     }
 }
