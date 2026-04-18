@@ -48,7 +48,7 @@ struct ProfileView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
-                    .background(ArtigoTheme.orange)
+                    .background(ArtisgoTheme.orange)
                     .clipShape(Capsule())
                 }
             }
@@ -70,7 +70,7 @@ struct ProfileView: View {
                             .font(.caption)
                             .foregroundStyle(.white)
                             .frame(width: 28, height: 28)
-                            .background(ArtigoTheme.orange)
+                            .background(ArtisgoTheme.orange)
                             .clipShape(Circle())
                             .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))
                     }
@@ -167,7 +167,7 @@ struct ProfileView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
     }
 
     private var classementButton: some View {

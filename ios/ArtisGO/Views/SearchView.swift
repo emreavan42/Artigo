@@ -259,7 +259,7 @@ struct SearchView: View {
         }
         .mapStyle(viewMode == .satellite ? .imagery : .standard)
         .frame(height: 350)
-        .clipShape(.rect(cornerRadius: ArtigoTheme.cornerRadius))
+        .clipShape(.rect(cornerRadius: ArtisgoTheme.cornerRadius))
         .padding(.horizontal, 16)
     }
 
