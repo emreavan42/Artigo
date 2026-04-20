@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ArtigoApp: App {
+struct ArtisGOApp: App {
     @State private var appViewModel = AppViewModel()
 
     var body: some Scene {
