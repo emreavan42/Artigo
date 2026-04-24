@@ -1,4 +1,21 @@
 import SwiftUI
+import PhotosUI
+import AVFoundation
+import UniformTypeIdentifiers
+
+// MARK: - Modèle d'une pièce jointe en attente d'envoi
+struct PendingAttachment: Identifiable, Equatable {
+    enum Kind: Equatable {
+        case photo
+        case video
+        case pdf
+    }
+    let id: UUID = UUID()
+    let kind: Kind
+    let image: UIImage?
+    let url: URL?
+    let name: String
+}
 
 struct ChatView: View {
     let conversation: Conversation
@@ -7,6 +24,14 @@ struct ChatView: View {
     @State private var messageText: String = ""
     @State private var showAttachmentMenu: Bool = false
     @State private var showEmojiPicker: Bool = false
+
+    // États pour la sélection de fichiers
+    @State private var photoPickerItems: [PhotosPickerItem] = []
+    @State private var showPhotoPicker: Bool = false
+    @State private var showCamera: Bool = false
+    @State private var cameraMode: CameraMode = .photo
+    @State private var showPDFImporter: Bool = false
+    @State private var pendingAttachments: [PendingAttachment] = []
 
     var body: some View {
         VStack(spacing: 0) {
@@ -30,6 +55,9 @@ struct ChatView: View {
                 }
             }
             quickReplies
+            if !pendingAttachments.isEmpty {
+                attachmentsPreview
+            }
             inputBar
         }
         .background(Color(.systemGroupedBackground))
@@ -40,6 +68,70 @@ struct ChatView: View {
                 showEmojiPicker = false
             }
             .presentationDetents([.height(300)])
+        }
+        // Feuille modale du menu d'attachement
+        .sheet(isPresented: $showAttachmentMenu) {
+            AttachmentMenuSheet(
+                onPickPhoto: {
+                    showAttachmentMenu = false
+                    cameraMode = .photo
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showCamera = true
+                    }
+                },
+                onPickVideo: {
+                    showAttachmentMenu = false
+                    cameraMode = .video
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showCamera = true
+                    }
+                },
+                onPickGallery: {
+                    showAttachmentMenu = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showPhotoPicker = true
+                    }
+                },
+                onPickPDF: {
+                    showAttachmentMenu = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showPDFImporter = true
+                    }
+                },
+                onCancel: {
+                    showAttachmentMenu = false
+                }
+            )
+            .presentationDetents([.height(360)])
+            .presentationDragIndicator(.visible)
+        }
+        // Sélecteur de la galerie photos/vidéos (multi)
+        .photosPicker(
+            isPresented: $showPhotoPicker,
+            selection: $photoPickerItems,
+            maxSelectionCount: 10,
+            matching: .any(of: [.images, .videos])
+        )
+        .onChange(of: photoPickerItems) { _, newItems in
+            Task { await loadPickerItems(newItems) }
+        }
+        // Caméra (photo ou vidéo)
+        .fullScreenCover(isPresented: $showCamera) {
+            CameraCaptureProxy(mode: cameraMode) { attachment in
+                if let attachment {
+                    pendingAttachments.append(attachment)
+                }
+                showCamera = false
+            }
+            .ignoresSafeArea()
+        }
+        // Importateur PDF
+        .fileImporter(
+            isPresented: $showPDFImporter,
+            allowedContentTypes: [.pdf],
+            allowsMultipleSelection: false
+        ) { result in
+            handlePDFImport(result)
         }
     }
 
@@ -148,23 +240,36 @@ struct ChatView: View {
         .padding(.vertical, 6)
     }
 
+    // MARK: - Aperçu horizontal des pièces jointes
+    private var attachmentsPreview: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(pendingAttachments) { att in
+                    AttachmentThumbnail(attachment: att) {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            pendingAttachments.removeAll { $0.id == att.id }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        }
+        .background(Color(.systemBackground))
+        .overlay(alignment: .top) { Divider() }
+    }
+
     private var inputBar: some View {
         HStack(spacing: 10) {
-            Button { showAttachmentMenu.toggle() } label: {
+            Button {
+                showAttachmentMenu = true
+            } label: {
                 Image(systemName: "plus")
                     .font(.body.bold())
                     .foregroundStyle(ArtisgoTheme.orange)
                     .frame(width: 36, height: 36)
                     .background(ArtisgoTheme.orange.opacity(0.12))
                     .clipShape(Circle())
-            }
-            .confirmationDialog("Envoyer", isPresented: $showAttachmentMenu) {
-                Button("Photos multiples") { }
-                Button("Vidéo courte") { }
-                Button("PDF / Devis") { }
-                Button("Photo chantier") { }
-                Button("Position GPS") { }
-                Button("Annuler", role: .cancel) { }
             }
             HStack(spacing: 6) {
                 TextField("Écrire un message", text: $messageText)
@@ -188,10 +293,10 @@ struct ChatView: View {
                     .font(.body)
                     .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
-                    .background(messageText.isEmpty ? Color.gray : ArtisgoTheme.orange)
+                    .background(canSend ? ArtisgoTheme.orange : Color.gray)
                     .clipShape(Circle())
             }
-            .disabled(messageText.isEmpty)
+            .disabled(!canSend)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -199,10 +304,334 @@ struct ChatView: View {
         .overlay(alignment: .top) { Divider() }
     }
 
+    // Activation du bouton Envoyer
+    private var canSend: Bool {
+        !messageText.trimmingCharacters(in: .whitespaces).isEmpty || !pendingAttachments.isEmpty
+    }
+
     private func sendMessage() {
-        guard !messageText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        viewModel.sendMessage(text: messageText, in: conversation)
+        guard canSend else { return }
+        let trimmed = messageText.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty {
+            viewModel.sendMessage(text: trimmed, in: conversation)
+        } else if !pendingAttachments.isEmpty {
+            // Envoi d'un message sans texte (aperçu nominal)
+            viewModel.sendMessage(text: "📎 \(pendingAttachments.count) pièce(s) jointe(s)", in: conversation)
+        }
         messageText = ""
+        pendingAttachments.removeAll()
+    }
+
+    // Chargement des éléments sélectionnés depuis la galerie
+    private func loadPickerItems(_ items: [PhotosPickerItem]) async {
+        for item in items {
+            // Tentative image
+            if let data = try? await item.loadTransferable(type: Data.self) {
+                if let image = UIImage(data: data) {
+                    let att = PendingAttachment(kind: .photo, image: image, url: nil, name: "Photo.jpg")
+                    pendingAttachments.append(att)
+                    continue
+                }
+                // Si ce n'est pas une image, on suppose vidéo
+                let tmpURL = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("video_\(UUID().uuidString).mov")
+                try? data.write(to: tmpURL)
+                let thumb = Self.videoThumbnail(url: tmpURL)
+                let att = PendingAttachment(kind: .video, image: thumb, url: tmpURL, name: "Vidéo.mov")
+                pendingAttachments.append(att)
+            }
+        }
+        photoPickerItems.removeAll()
+    }
+
+    private func handlePDFImport(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+            let didAccess = url.startAccessingSecurityScopedResource()
+            defer { if didAccess { url.stopAccessingSecurityScopedResource() } }
+            let tmpURL = FileManager.default.temporaryDirectory
+                .appendingPathComponent(url.lastPathComponent)
+            try? FileManager.default.removeItem(at: tmpURL)
+            try? FileManager.default.copyItem(at: url, to: tmpURL)
+            let att = PendingAttachment(kind: .pdf, image: nil, url: tmpURL, name: url.lastPathComponent)
+            pendingAttachments.append(att)
+        case .failure:
+            break
+        }
+    }
+
+    // Miniature vidéo
+    nonisolated static func videoThumbnail(url: URL) -> UIImage? {
+        let asset = AVURLAsset(url: url)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        if let cg = try? generator.copyCGImage(at: .zero, actualTime: nil) {
+            return UIImage(cgImage: cg)
+        }
+        return nil
+    }
+}
+
+// MARK: - Feuille modale du menu d'attachement
+private struct AttachmentMenuSheet: View {
+    let onPickPhoto: () -> Void
+    let onPickVideo: () -> Void
+    let onPickGallery: () -> Void
+    let onPickPDF: () -> Void
+    let onCancel: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Titre
+            Text("Joindre un fichier")
+                .font(.headline)
+                .padding(.top, 20)
+                .padding(.bottom, 8)
+
+            VStack(spacing: 0) {
+                AttachmentMenuRow(icon: "camera.fill", title: "Prendre une photo", action: onPickPhoto)
+                Divider().padding(.leading, 64)
+                AttachmentMenuRow(icon: "video.fill", title: "Enregistrer une vidéo", action: onPickVideo)
+                Divider().padding(.leading, 64)
+                AttachmentMenuRow(icon: "photo.on.rectangle.angled", title: "Galerie (photos et vidéos)", action: onPickGallery)
+                Divider().padding(.leading, 64)
+                AttachmentMenuRow(icon: "doc.fill", title: "Document PDF", action: onPickPDF)
+            }
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(.rect(cornerRadius: 14))
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+
+            Spacer()
+
+            Button(action: onCancel) {
+                Text("Annuler")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(.rect(cornerRadius: 14))
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 12)
+        }
+        .background(Color(.systemGroupedBackground))
+    }
+}
+
+private struct AttachmentMenuRow: View {
+    let icon: String
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(ArtisgoTheme.orange)
+                    .frame(width: 32, height: 32)
+                    .background(ArtisgoTheme.orange.opacity(0.12))
+                    .clipShape(.rect(cornerRadius: 8))
+                Text(title)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.bold())
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.horizontal, 16)
+            .frame(minHeight: 56)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(AttachmentRowButtonStyle())
+    }
+}
+
+private struct AttachmentRowButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(configuration.isPressed ? Color.primary.opacity(0.06) : Color.clear)
+    }
+}
+
+// MARK: - Miniature d'une pièce jointe en attente
+private struct AttachmentThumbnail: View {
+    let attachment: PendingAttachment
+    let onRemove: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Group {
+                switch attachment.kind {
+                case .photo:
+                    thumbnailImage
+                case .video:
+                    thumbnailImage
+                        .overlay {
+                            Image(systemName: "play.circle.fill")
+                                .font(.title)
+                                .foregroundStyle(.white)
+                                .shadow(radius: 2)
+                        }
+                case .pdf:
+                    VStack(spacing: 4) {
+                        Image(systemName: "doc.fill")
+                            .font(.title2)
+                            .foregroundStyle(ArtisgoTheme.orange)
+                        Text(attachment.name)
+                            .font(.system(size: 9, weight: .medium))
+                            .lineLimit(2)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.primary)
+                            .padding(.horizontal, 4)
+                    }
+                    .frame(width: 80, height: 80)
+                    .background(ArtisgoTheme.orange.opacity(0.12))
+                    .clipShape(.rect(cornerRadius: 10))
+                }
+            }
+
+            Button(action: onRemove) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 20, height: 20)
+                    .background(Color.black.opacity(0.7))
+                    .clipShape(Circle())
+            }
+            .offset(x: 6, y: -6)
+        }
+        .padding(.top, 6)
+        .padding(.trailing, 6)
+    }
+
+    private var thumbnailImage: some View {
+        Color(.secondarySystemBackground)
+            .frame(width: 80, height: 80)
+            .overlay {
+                if let img = attachment.image {
+                    Image(uiImage: img)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .allowsHitTesting(false)
+                } else {
+                    Image(systemName: "photo")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .clipShape(.rect(cornerRadius: 10))
+    }
+}
+
+// MARK: - Caméra via UIImagePickerController
+enum CameraMode {
+    case photo
+    case video
+}
+
+struct CameraCaptureProxy: View {
+    let mode: CameraMode
+    let onComplete: (PendingAttachment?) -> Void
+
+    var body: some View {
+        #if targetEnvironment(simulator)
+        CameraUnavailablePlaceholder(onDismiss: { onComplete(nil) })
+        #else
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            CameraPicker(mode: mode, onComplete: onComplete)
+        } else {
+            CameraUnavailablePlaceholder(onDismiss: { onComplete(nil) })
+        }
+        #endif
+    }
+}
+
+private struct CameraUnavailablePlaceholder: View {
+    let onDismiss: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color(.systemGroupedBackground).ignoresSafeArea()
+            VStack(spacing: 20) {
+                Image(systemName: "camera.fill")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.secondary)
+                Text("Caméra indisponible")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                Text("Installez cette application sur votre appareil via l'app Rork pour utiliser la caméra.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                Button("Fermer", action: onDismiss)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 12)
+                    .background(ArtisgoTheme.orange)
+                    .clipShape(Capsule())
+            }
+        }
+    }
+}
+
+private struct CameraPicker: UIViewControllerRepresentable {
+    let mode: CameraMode
+    let onComplete: (PendingAttachment?) -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onComplete: onComplete)
+    }
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.delegate = context.coordinator
+        switch mode {
+        case .photo:
+            picker.mediaTypes = [UTType.image.identifier]
+            picker.cameraCaptureMode = .photo
+        case .video:
+            picker.mediaTypes = [UTType.movie.identifier]
+            picker.cameraCaptureMode = .video
+            picker.videoQuality = .typeHigh
+        }
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let onComplete: (PendingAttachment?) -> Void
+        init(onComplete: @escaping (PendingAttachment?) -> Void) {
+            self.onComplete = onComplete
+        }
+
+        nonisolated func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            let handler = onComplete
+            if let image = info[.originalImage] as? UIImage {
+                let att = PendingAttachment(kind: .photo, image: image, url: nil, name: "Photo.jpg")
+                Task { @MainActor in handler(att) }
+                return
+            }
+            if let videoURL = info[.mediaURL] as? URL {
+                let thumb = ChatView.videoThumbnail(url: videoURL)
+                let att = PendingAttachment(kind: .video, image: thumb, url: videoURL, name: "Vidéo.mov")
+                Task { @MainActor in handler(att) }
+                return
+            }
+            Task { @MainActor in handler(nil) }
+        }
+
+        nonisolated func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            let handler = onComplete
+            Task { @MainActor in handler(nil) }
+        }
     }
 }
 
